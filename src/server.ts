@@ -1,13 +1,16 @@
 import http from "http";
 import express from "express";
+import { rocketsRouter } from "./rockets.js";
 
 const app = express();
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 const server = http.createServer(app);
 
-app.get("/health", (_req, res) => {
+app.use(express.json());
+app.use("/health", (_req, res) => {
   res.json({ status: "ok", uptime: process.uptime(), timestamp: new Date().toISOString() });
 });
+app.use("/api", rocketsRouter);
 
 export const startServer = async (): Promise<http.Server> => {
   return new Promise((resolve) => {

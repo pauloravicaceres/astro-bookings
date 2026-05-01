@@ -1,5 +1,7 @@
 # AstroBookings
 
+Current version: 0.2.0
+
 AstroBookings is a backend API for managing rockets, launches, customers, and seat bookings for demo space travel operations.
 
 ## Current Scope
