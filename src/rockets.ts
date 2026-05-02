@@ -1,4 +1,5 @@
 import { Router, Request, Response } from "express";
+import { info, warn } from "./logger.js";
 
 const validRanges = ["suborbital", "orbital", "moon", "mars"] as const;
 
@@ -52,6 +53,7 @@ const validateRocket = (rocket: RocketCreate | RocketUpdate): string | null => {
 const findRocket = (id: string): Rocket | undefined => rockets.find((rocket) => rocket.id === id);
 
 router.get("/rockets", (_req: Request, res: Response) => {
+  info("List rockets", { count: rockets.length });
   res.json(rockets);
 });
 
@@ -75,6 +77,7 @@ router.post("/rockets", (req: RocketRequest<RocketCreate>, res: Response) => {
   };
 
   rockets.push(newRocket);
+  info("Created rocket", { id: newRocket.id, name: newRocket.name });
   return res.status(201).json(newRocket);
 });
 
@@ -82,6 +85,7 @@ router.get("/rockets/:id", (req: Request<{ id: string }>, res: Response) => {
   const rocket = findRocket(req.params.id);
 
   if (!rocket) {
+    warn("Rocket not found", { id: req.params.id });
     return res.status(404).json({ error: "Rocket not found." });
   }
 
@@ -99,6 +103,7 @@ router.put("/rockets/:id", (req: Request<{ id: string }, unknown, RocketUpdate>,
   const validationError = validateRocket(payload);
 
   if (validationError) {
+    warn("Validation error updating rocket", { id: req.params.id, error: validationError });
     return res.status(400).json({ error: validationError });
   }
 
@@ -119,10 +124,12 @@ router.delete("/rockets/:id", (req: Request<{ id: string }>, res: Response) => {
   const index = rockets.findIndex((item) => item.id === req.params.id);
 
   if (index === -1) {
+    warn("Attempted to delete nonexistent rocket", { id: req.params.id });
     return res.status(404).json({ error: "Rocket not found." });
   }
 
   rockets.splice(index, 1);
+  info("Deleted rocket", { id: req.params.id });
   return res.status(204).end();
 });
 
