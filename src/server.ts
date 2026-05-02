@@ -3,11 +3,11 @@ import express from "express";
 import { rocketsRouter } from "./rockets.js";
 
 const app = express();
-const port = process.env.PORT ? Number(process.env.PORT) : 3000;
+const port = Number(process.env.PORT ?? 3000);
 const server = http.createServer(app);
 
 app.use(express.json());
-app.use("/health", (_req, res) => {
+app.get("/health", (_req, res) => {
   res.json({ status: "ok", uptime: process.uptime(), timestamp: new Date().toISOString() });
 });
 app.use("/api", rocketsRouter);
